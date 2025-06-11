@@ -1,0 +1,174 @@
+
+                    /*
+                    string screenshotPath = @"..\..\screenshot.jpg";
+                    screenshot.Save(screenshotPath);
+                    // 调用 Python 脚本
+                    string pythonScriptPath = @"..\..\run.py";
+                    ProcessStartInfo start = new ProcessStartInfo();
+                    start.FileName = @"C:\Users\86188\AppData\Local\Microsoft\WindowsApps\python.exe"; // 替换为你的 Python 解释器路径
+                    start.Arguments = $"\"{pythonScriptPath}\" \"{screenshotPath}\"";
+                    start.UseShellExecute = false;
+                    start.CreateNoWindow = true;
+                    start.RedirectStandardOutput = true;
+                    start.RedirectStandardError = true;
+                    
+                    using (Process process = new Process())
+                    {
+                        process.StartInfo = start;
+                        process.Start();
+                        
+                        string output = process.StandardOutput.ReadToEnd();
+                        string error = process.StandardError.ReadToEnd();
+                        process.WaitForExit();
+
+                        textBox1.Text = output;
+                    }
+
+                    screenshotPictureBox.Image = Image.FromFile(@"..\..\results-images\output.jpg" );
+                    */
+
+
+
+
+        //===========================================================================================================================
+        /*
+        static void Main()
+        {
+            // 初始化Python运行时
+            PythonEngine.Initialize();
+
+            using (Py.GIL())
+            {
+                // 导入Python模块
+                dynamic sys = Py.Import("sys");
+                Console.WriteLine($"Python版本: {sys.version}");
+
+                // 导入自定义Python模块（假设你的脚本定义了一个函数）
+                dynamic testModule = Py.Import("test");
+                dynamic result = testModule.your_function(); // 替换为实际的函数名
+                Console.WriteLine($"Python函数返回结果: {result}");
+            }
+
+            // 关闭Python运行时
+            PythonEngine.Shutdown();
+        }
+        */
+
+
+
+
+                private Bitmap PreprocessImage( Bitmap originalImage )
+        {
+            // 转换为灰度图像
+            Bitmap grayImage = new Bitmap(originalImage.Width, originalImage.Height);
+            for (int x = 0; x < originalImage.Width; x++)
+            {
+                for (int y = 0; y < originalImage.Height; y++)
+                {
+                    Color originalColor = originalImage.GetPixel(x, y);
+                    int grayScale = (int)((originalColor.R * 0.3) + (originalColor.G * 0.59) + (originalColor.B * 0.11));
+                    Color newColor = Color.FromArgb(grayScale, grayScale, grayScale);
+                    grayImage.SetPixel(x, y, newColor);
+                }
+            }
+
+            // 二值化处理
+            Bitmap binaryImage = new Bitmap(grayImage.Width, grayImage.Height);
+            for (int x = 0; x < grayImage.Width; x++)
+            {
+                for (int y = 0; y < grayImage.Height; y++)
+                {
+                    Color grayColor = grayImage.GetPixel(x, y);
+                    int threshold = 128;
+                    if (grayColor.R < threshold)
+                    {
+                        binaryImage.SetPixel(x, y, Color.Black);
+                    }
+                    else
+                    {
+                        binaryImage.SetPixel(x, y, Color.White);
+                    }
+                }
+            }
+
+            return binaryImage;
+        }
+
+
+using System;
+using System.IO;
+using Python.Runtime;
+
+public static class PythonCaller
+{
+    // 初始化 Python 环境（需在程序启动时调用）
+    public static void InitializePython()
+    {
+        // 设置 Python 解释器路径（根据实际安装路径调整）
+        Environment.SetEnvironmentVariable("PYTHONNET_PYTHON_HOME", @"C:\Python39"); 
+        Environment.SetEnvironmentVariable("PATH", $@"C:\Python39;{Environment.GetEnvironmentVariable("PATH")}");
+
+        // 初始化 Python 运行时
+        PythonEngine.Initialize();
+        using (Py.GIL())
+        {
+            // 导入 sys 模块并设置搜索路径（添加自定义模块路径）
+            dynamic sys = Py.Import("sys");
+            sys.path.append(Directory.GetCurrentDirectory()); // 添加当前目录到 Python 搜索路径
+        }
+    }
+
+    // 调用 Python 模块中的函数
+    public static object CallPythonFunction(string moduleName, string functionName, params object[] args)
+    {
+        try
+        {
+            using (Py.GIL()) // 获取 Python GIL 锁（线程安全）
+            {
+                dynamic module = Py.Import(moduleName); // 导入 Python 模块
+                dynamic function = module.GetAttr(functionName); // 获取函数
+                return function(*args); // 调用函数并返回结果
+            }
+        }
+        catch (PythonException ex)
+        {
+            Console.WriteLine($"Python 函数调用失败：{ex.Message}");
+            return null;
+        }
+    }
+
+    // 实例化 Python 类并调用方法
+    public static object CreatePythonInstance(string moduleName, string className, params object[] args)
+    {
+        try
+        {
+            using (Py.GIL())
+            {
+                dynamic module = Py.Import(moduleName);
+                dynamic classType = module.GetAttr(className);
+                return classType(*args); // 实例化类
+            }
+        }
+        catch (PythonException ex)
+        {
+            Console.WriteLine($"Python 类实例化失败：{ex.Message}");
+            return null;
+        }
+    }
+
+    // 执行 Python 脚本文件
+    public static void ExecutePythonScript(string scriptPath)
+    {
+        try
+        {
+            using (Py.GIL())
+            {
+                Py.RunFile(scriptPath); // 执行脚本文件
+            }
+        }
+        catch (PythonException ex)
+        {
+            Console.WriteLine($"脚本执行失败：{ex.Message}");
+        }
+    }
+}
