@@ -1,5 +1,6 @@
 # 借助大模型AI Coding实现象棋AI辅助
 
+点击查看哔哩哔哩视频：
 [![视频封面图](http://i2.hdslb.com/bfs/archive/6fc7d45035a5849d77ddde9f4c6bdc9f5c8c219d.jpg)](https://www.bilibili.com/video/BV11dMjztERU/?share_source=copy_web&vd_source=6a0d095ae268c7e99cd330b4b78e80c6)
 
 
