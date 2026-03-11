@@ -1,5 +1,15 @@
 # 借助大模型AI Coding实现象棋AI辅助
+<iframe src="https://www.bilibili.com/video/BV11dMjztERU/?share_source=copy_web&vd_source=6a0d095ae268c7e99cd330b4b78e80c6" 
+        scrolling="no" 
+        border="0" 
+        frameborder="no" 
+        framespacing="0" 
+        allowfullscreen="true" 
+        width="100%" 
+        height="500">
+</iframe>
 
+[![视频封面图](http://i2.hdslb.com/bfs/archive/6fc7d45035a5849d77ddde9f4c6bdc9f5c8c219d.jpg)](https://www.bilibili.com/video/BV11dMjztERU/?share_source=copy_web&vd_source=6a0d095ae268c7e99cd330b4b78e80c6)
 
 
 ### 象棋AI代码关键步骤
